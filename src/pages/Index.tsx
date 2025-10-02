@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -7,13 +8,21 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { useToast } from '@/hooks/use-toast';
 import Icon from '@/components/ui/icon';
+import { api, storage, type User } from '@/lib/api';
 
 function Index() {
+  const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('Все');
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+  const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState({ email: '', password: '', name: '', phone: '', message: '' });
+  const { toast } = useToast();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -22,6 +31,86 @@ function Index() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    const auth = storage.getAuth();
+    if (auth) {
+      setUser(auth.user);
+      setToken(auth.token);
+    }
+  }, []);
+
+  const handleAuth = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    
+    try {
+      let response;
+      if (authMode === 'login') {
+        response = await api.login(formData.email, formData.password);
+      } else {
+        response = await api.register(formData.email, formData.password, formData.name);
+      }
+      
+      setUser(response.user);
+      setToken(response.token);
+      storage.saveAuth(response.user, response.token);
+      setIsAuthOpen(false);
+      
+      toast({
+        title: 'Успешно!',
+        description: authMode === 'login' ? 'Вы вошли в систему' : 'Регистрация завершена'
+      });
+      
+      setFormData({ email: '', password: '', name: '', phone: '', message: '' });
+    } catch (error: any) {
+      toast({
+        title: 'Ошибка',
+        description: error.message,
+        variant: 'destructive'
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    setToken(null);
+    storage.clearAuth();
+    toast({
+      title: 'Вы вышли из системы'
+    });
+  };
+
+  const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    
+    try {
+      await api.sendContactForm({
+        name: formData.name,
+        phone: formData.phone,
+        email: formData.email,
+        message: formData.message
+      });
+      
+      toast({
+        title: 'Отправлено!',
+        description: 'Спасибо! Мы свяжемся с вами в ближайшее время.'
+      });
+      
+      setFormData({ ...formData, name: '', phone: '', email: '', message: '' });
+    } catch (error: any) {
+      toast({
+        title: 'Ошибка',
+        description: error.message,
+        variant: 'destructive'
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const portfolio = [
     {
@@ -87,44 +176,75 @@ function Index() {
             <a href="#services" className="text-white hover:text-primary transition-colors">Услуги</a>
             <a href="#reviews" className="text-white hover:text-primary transition-colors">Отзывы</a>
             <a href="#contact" className="text-white hover:text-primary transition-colors">Контакты</a>
-            <Dialog open={isAuthOpen} onOpenChange={setIsAuthOpen}>
-              <DialogTrigger asChild>
-                <Button variant="outline" className="bg-white/10 text-white border-white/20 hover:bg-white/20">
-                  <Icon name="User" size={16} className="mr-2" />
-                  Войти
+{user ? (
+              <div className="flex items-center gap-4">
+                <Button variant="outline" className="bg-white/10 text-white border-white/20 hover:bg-white/20" onClick={() => navigate('/dashboard')}>
+                  <Icon name="LayoutDashboard" size={16} className="mr-2" />
+                  {user.name}
                 </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                  <DialogTitle>{authMode === 'login' ? 'Вход' : 'Регистрация'}</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <div>
-                    <Label>Email</Label>
-                    <Input type="email" placeholder="your@email.com" />
-                  </div>
-                  <div>
-                    <Label>Пароль</Label>
-                    <Input type="password" placeholder="••••••••" />
-                  </div>
-                  {authMode === 'register' && (
-                    <div>
-                      <Label>Имя</Label>
-                      <Input type="text" placeholder="Ваше имя" />
-                    </div>
-                  )}
-                  <Button className="w-full">
-                    {authMode === 'login' ? 'Войти' : 'Зарегистрироваться'}
+                <Button variant="outline" className="bg-white/10 text-white border-white/20 hover:bg-white/20" onClick={handleLogout}>
+                  Выйти
+                </Button>
+              </div>
+            ) : (
+              <Dialog open={isAuthOpen} onOpenChange={setIsAuthOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="bg-white/10 text-white border-white/20 hover:bg-white/20">
+                    <Icon name="User" size={16} className="mr-2" />
+                    Войти
                   </Button>
-                  <button 
-                    onClick={() => setAuthMode(authMode === 'login' ? 'register' : 'login')}
-                    className="text-sm text-muted-foreground hover:text-foreground w-full text-center"
-                  >
-                    {authMode === 'login' ? 'Нет аккаунта? Регистрация' : 'Уже есть аккаунт? Войти'}
-                  </button>
-                </div>
-              </DialogContent>
-            </Dialog>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>{authMode === 'login' ? 'Вход' : 'Регистрация'}</DialogTitle>
+                  </DialogHeader>
+                  <form onSubmit={handleAuth} className="space-y-4">
+                    <div>
+                      <Label>Email</Label>
+                      <Input 
+                        type="email" 
+                        placeholder="your@email.com" 
+                        value={formData.email}
+                        onChange={(e) => setFormData({...formData, email: e.target.value})}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label>Пароль</Label>
+                      <Input 
+                        type="password" 
+                        placeholder="••••••••" 
+                        value={formData.password}
+                        onChange={(e) => setFormData({...formData, password: e.target.value})}
+                        required
+                      />
+                    </div>
+                    {authMode === 'register' && (
+                      <div>
+                        <Label>Имя</Label>
+                        <Input 
+                          type="text" 
+                          placeholder="Ваше имя" 
+                          value={formData.name}
+                          onChange={(e) => setFormData({...formData, name: e.target.value})}
+                          required
+                        />
+                      </div>
+                    )}
+                    <Button type="submit" className="w-full" disabled={isLoading}>
+                      {isLoading ? 'Загрузка...' : authMode === 'login' ? 'Войти' : 'Зарегистрироваться'}
+                    </Button>
+                    <button 
+                      type="button"
+                      onClick={() => setAuthMode(authMode === 'login' ? 'register' : 'login')}
+                      className="text-sm text-muted-foreground hover:text-foreground w-full text-center"
+                    >
+                      {authMode === 'login' ? 'Нет аккаунта? Регистрация' : 'Уже есть аккаунт? Войти'}
+                    </button>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            )}
           </div>
         </div>
       </nav>
@@ -367,26 +487,51 @@ function Index() {
             <Card className="bg-gray-900 border-gray-800 p-8">
               <CardContent>
                 <h4 className="text-2xl font-bold text-white mb-6">Записаться на сеанс</h4>
-                <form className="space-y-4">
+                <form onSubmit={handleContactSubmit} className="space-y-4">
                   <div>
                     <Label className="text-white">Имя</Label>
-                    <Input placeholder="Ваше имя" className="bg-black border-gray-800 text-white" />
+                    <Input 
+                      placeholder="Ваше имя" 
+                      className="bg-black border-gray-800 text-white" 
+                      value={formData.name}
+                      onChange={(e) => setFormData({...formData, name: e.target.value})}
+                      required
+                    />
                   </div>
                   <div>
                     <Label className="text-white">Телефон</Label>
-                    <Input placeholder="+7 (___) ___-__-__" className="bg-black border-gray-800 text-white" />
+                    <Input 
+                      placeholder="+7 (___) ___-__-__" 
+                      className="bg-black border-gray-800 text-white" 
+                      value={formData.phone}
+                      onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                      required
+                    />
                   </div>
                   <div>
                     <Label className="text-white">Email</Label>
-                    <Input type="email" placeholder="your@email.com" className="bg-black border-gray-800 text-white" />
+                    <Input 
+                      type="email" 
+                      placeholder="your@email.com" 
+                      className="bg-black border-gray-800 text-white" 
+                      value={formData.email}
+                      onChange={(e) => setFormData({...formData, email: e.target.value})}
+                      required
+                    />
                   </div>
                   <div>
                     <Label className="text-white">Описание татуировки</Label>
-                    <Textarea placeholder="Расскажите о вашей идее..." className="bg-black border-gray-800 text-white min-h-32" />
+                    <Textarea 
+                      placeholder="Расскажите о вашей идее..." 
+                      className="bg-black border-gray-800 text-white min-h-32" 
+                      value={formData.message}
+                      onChange={(e) => setFormData({...formData, message: e.target.value})}
+                      required
+                    />
                   </div>
-                  <Button className="w-full bg-primary hover:bg-primary/90 text-lg py-6">
+                  <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-lg py-6" disabled={isLoading}>
                     <Icon name="Send" size={20} className="mr-2" />
-                    Отправить заявку
+                    {isLoading ? 'Отправка...' : 'Отправить заявку'}
                   </Button>
                 </form>
               </CardContent>

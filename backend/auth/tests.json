@@ -1,0 +1,57 @@
+{
+  "tests": [
+    {
+      "name": "Test login with valid credentials",
+      "method": "POST",
+      "body": {
+        "action": "login",
+        "email": "master@anime-tattoo.ru",
+        "password": "master123"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "user": {
+          "email": "string",
+          "name": "string",
+          "role": "string"
+        },
+        "token": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Test login with invalid credentials",
+      "method": "POST",
+      "body": {
+        "action": "login",
+        "email": "wrong@email.com",
+        "password": "wrongpass"
+      },
+      "expectedStatus": 401,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Test registration",
+      "method": "POST",
+      "body": {
+        "action": "register",
+        "email": "newuser@test.com",
+        "password": "testpass123",
+        "name": "Test User"
+      },
+      "expectedStatus": 201,
+      "expectedBody": {
+        "user": {
+          "email": "string",
+          "name": "string",
+          "role": "string"
+        },
+        "token": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

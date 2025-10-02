@@ -1,0 +1,15 @@
+{
+  "tests": [
+    {
+      "name": "Test create booking",
+      "method": "POST",
+      "body": {
+        "user_id": 1,
+        "service_id": 1,
+        "booking_date": "2025-10-15T14:00:00",
+        "notes": "Хочу дракона на плече"
+      },
+      "expectedStatus": 201
+    }
+  ]
+}
