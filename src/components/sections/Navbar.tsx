@@ -50,7 +50,10 @@ function Navbar({
           <a href="#contact" className="text-white hover:text-primary transition-colors">Контакты</a>
           {user ? (
             <div className="flex items-center gap-4">
-              <Button variant="outline" className="bg-white/10 text-white border-white/20 hover:bg-white/20" onClick={() => navigate('/dashboard')}>
+              <Button variant="outline" className="bg-white/10 text-white border-white/20 hover:bg-white/20" onClick={() => {
+                const userRole = localStorage.getItem('userRole');
+                navigate(userRole === 'master' ? '/master-dashboard' : '/client-dashboard');
+              }}>
                 <Icon name="LayoutDashboard" size={16} className="mr-2" />
                 {user.name}
               </Button>
@@ -84,6 +87,9 @@ function Navbar({
                       onChange={(e) => onFormDataChange({...formData, email: e.target.value})}
                       required
                     />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      💡 Для доступа мастера используйте email с "master" (например: master@test.ru)
+                    </p>
                   </div>
                   <div>
                     <Label>Пароль</Label>

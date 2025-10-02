@@ -42,7 +42,7 @@ const MasterDashboard = () => {
   const [price, setPrice] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
-  const userId = localStorage.getItem('userId');
+  const [userId] = useState(() => localStorage.getItem('userId'));
 
   useEffect(() => {
     if (!userId) {
@@ -50,7 +50,7 @@ const MasterDashboard = () => {
       return;
     }
     loadOrders();
-  }, []);
+  }, [userId]);
 
   const loadOrders = async () => {
     try {

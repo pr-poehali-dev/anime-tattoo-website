@@ -39,7 +39,7 @@ const ClientDashboard = () => {
   const [paymentMethod, setPaymentMethod] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
 
-  const userId = localStorage.getItem('userId');
+  const [userId] = useState(() => localStorage.getItem('userId'));
 
   useEffect(() => {
     if (!userId) {
@@ -47,7 +47,7 @@ const ClientDashboard = () => {
       return;
     }
     loadOrders();
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
     const orderId = searchParams.get('orderId');

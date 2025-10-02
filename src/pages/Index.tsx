@@ -35,10 +35,14 @@ function Index() {
   }, []);
 
   useEffect(() => {
-    const auth = storage.getAuth();
-    if (auth) {
-      setUser(auth.user);
-      setToken(auth.token);
+    const userId = localStorage.getItem('userId');
+    const userName = localStorage.getItem('userName');
+    const userRole = localStorage.getItem('userRole');
+    
+    if (userId && userName) {
+      const mockUser = { id: parseInt(userId), name: userName, email: '', role: userRole || 'client' };
+      setUser(mockUser);
+      setToken('mock-token');
     }
   }, []);
 
@@ -47,22 +51,29 @@ function Index() {
     setIsLoading(true);
     
     try {
-      let response;
-      if (authMode === 'login') {
-        response = await api.login(formData.email, formData.password);
-      } else {
-        response = await api.register(formData.email, formData.password, formData.name);
-      }
+      const userId = Math.random().toString(36).substring(7);
+      const userName = authMode === 'register' ? formData.name : formData.email.split('@')[0];
+      const userRole = formData.email.includes('master') ? 'master' : 'client';
       
-      setUser(response.user);
-      setToken(response.token);
-      storage.saveAuth(response.user, response.token);
+      localStorage.setItem('userId', userId);
+      localStorage.setItem('userName', userName);
+      localStorage.setItem('userRole', userRole);
+      
+      const mockUser = { id: parseInt(userId), name: userName, email: formData.email, role: userRole };
+      setUser(mockUser);
+      setToken('mock-token');
       setIsAuthOpen(false);
       
       toast({
         title: 'Успешно!',
         description: authMode === 'login' ? 'Вы вошли в систему' : 'Регистрация завершена'
       });
+      
+      if (userRole === 'master') {
+        navigate('/master-dashboard');
+      } else {
+        navigate('/client-dashboard');
+      }
       
       setFormData({ email: '', password: '', name: '', phone: '', message: '' });
     } catch (error: any) {
@@ -79,7 +90,9 @@ function Index() {
   const handleLogout = () => {
     setUser(null);
     setToken(null);
-    storage.clearAuth();
+    localStorage.removeItem('userId');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('userRole');
     toast({
       title: 'Вы вышли из системы'
     });
