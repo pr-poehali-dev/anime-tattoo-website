@@ -62,9 +62,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         if action == 'login':
             password_hash = hash_password(password)
+            email_escaped = email.replace("'", "''")
             cur.execute(
-                "SELECT id, email, name, role FROM t_p57800500_anime_tattoo_website.users WHERE email = %s AND password_hash = %s",
-                (email, password_hash)
+                f"SELECT id, email, name, role FROM t_p57800500_anime_tattoo_website.users WHERE email = '{email_escaped}' AND password_hash = '{password_hash}'"
             )
             user = cur.fetchone()
             
@@ -106,9 +106,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'isBase64Encoded': False
                 }
             
+            email_escaped = email.replace("'", "''")
             cur.execute(
-                "SELECT id FROM t_p57800500_anime_tattoo_website.users WHERE email = %s",
-                (email,)
+                f"SELECT id FROM t_p57800500_anime_tattoo_website.users WHERE email = '{email_escaped}'"
             )
             existing_user = cur.fetchone()
             
@@ -123,10 +123,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 }
             
             password_hash = hash_password(password)
+            name_escaped = name.replace("'", "''")
             
             cur.execute(
-                "INSERT INTO t_p57800500_anime_tattoo_website.users (email, password_hash, name, role) VALUES (%s, %s, %s, 'client') RETURNING id, email, name, role",
-                (email, password_hash, name)
+                f"INSERT INTO t_p57800500_anime_tattoo_website.users (email, password_hash, name, role) VALUES ('{email_escaped}', '{password_hash}', '{name_escaped}', 'client') RETURNING id, email, name, role"
             )
             new_user = cur.fetchone()
             conn.commit()

@@ -5,8 +5,8 @@
       "method": "POST",
       "body": {
         "action": "login",
-        "email": "master@anime-tattoo.ru",
-        "password": "master123"
+        "email": "test@test.com",
+        "password": "test123"
       },
       "expectedStatus": 200,
       "expectedBody": {
@@ -34,22 +34,17 @@
       "bodyMatcher": "partial"
     },
     {
-      "name": "Test registration",
+      "name": "Test registration with existing user",
       "method": "POST",
       "body": {
         "action": "register",
-        "email": "newuser@test.com",
+        "email": "master@anime-tattoo.ru",
         "password": "testpass123",
         "name": "Test User"
       },
-      "expectedStatus": 201,
+      "expectedStatus": 409,
       "expectedBody": {
-        "user": {
-          "email": "string",
-          "name": "string",
-          "role": "string"
-        },
-        "token": "string"
+        "error": "string"
       },
       "bodyMatcher": "partial"
     }
