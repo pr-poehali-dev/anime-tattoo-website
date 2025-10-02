@@ -63,12 +63,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         if action == 'login':
             password_hash = hash_password(password)
             email_escaped = email.replace("'", "''")
-            print(f"Login attempt: email={email}, hash={password_hash}")
             cur.execute(
                 f"SELECT id, email, name, role FROM t_p57800500_anime_tattoo_website.users WHERE email = '{email_escaped}' AND password_hash = '{password_hash}'"
             )
             user = cur.fetchone()
-            print(f"User found: {user}")
             
             if not user:
                 cur.close()
