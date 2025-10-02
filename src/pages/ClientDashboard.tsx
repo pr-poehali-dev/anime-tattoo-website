@@ -47,7 +47,7 @@ const ClientDashboard = () => {
       return;
     }
     loadOrders();
-  }, [userId]);
+  }, []);
 
   useEffect(() => {
     const orderId = searchParams.get('orderId');

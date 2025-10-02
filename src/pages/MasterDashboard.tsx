@@ -50,7 +50,7 @@ const MasterDashboard = () => {
       return;
     }
     loadOrders();
-  }, [userId]);
+  }, []);
 
   const loadOrders = async () => {
     try {

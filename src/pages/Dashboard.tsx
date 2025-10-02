@@ -30,7 +30,7 @@ function Dashboard() {
     } else {
       navigate('/client-dashboard');
     }
-  }, [navigate]);
+  }, []);
 
   const loadBookings = async (userId: number, authToken: string) => {
     setIsLoading(true);
