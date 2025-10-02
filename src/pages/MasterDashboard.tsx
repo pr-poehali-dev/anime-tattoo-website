@@ -46,7 +46,7 @@ const MasterDashboard = () => {
 
   useEffect(() => {
     if (!userId) {
-      navigate('/dashboard');
+      navigate('/');
       return;
     }
     loadOrders();

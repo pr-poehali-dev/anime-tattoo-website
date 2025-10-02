@@ -43,7 +43,7 @@ const ClientDashboard = () => {
 
   useEffect(() => {
     if (!userId) {
-      navigate('/dashboard');
+      navigate('/');
       return;
     }
     loadOrders();
