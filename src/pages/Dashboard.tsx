@@ -24,7 +24,12 @@ function Dashboard() {
     }
     setUser(auth.user);
     setToken(auth.token);
-    loadBookings(auth.user.id, auth.token);
+    
+    if (auth.user.role === 'master') {
+      navigate('/master-dashboard');
+    } else {
+      navigate('/client-dashboard');
+    }
   }, [navigate]);
 
   const loadBookings = async (userId: number, authToken: string) => {

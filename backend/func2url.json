@@ -1,4 +1,6 @@
 {
+  "orders": "https://functions.poehali.dev/70a8d501-1b95-4105-97ed-d5928e0e12d5",
+  "messages": "https://functions.poehali.dev/702e7931-41cc-45a8-ad61-5ca8fc761bab",
   "auth": "https://functions.poehali.dev/db3baf7a-7ff5-441e-8969-5832417e14c7",
   "bookings": "https://functions.poehali.dev/80444fd1-2f9b-4ad7-b78e-a708172966ad",
   "contact": "https://functions.poehali.dev/cf06bc83-1174-4f8b-8a12-104636153942"

@@ -1,7 +1,22 @@
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 
 function HeroSection() {
+  const navigate = useNavigate();
+
+  const handleOrderClick = () => {
+    const userId = localStorage.getItem('userId');
+    if (userId) {
+      navigate('/create-order');
+    } else {
+      const authButton = document.querySelector('[data-auth-button]') as HTMLElement;
+      if (authButton) {
+        authButton.click();
+      }
+    }
+  };
+
   return (
     <section className="relative h-screen flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-black via-purple-900/30 to-black">
@@ -19,9 +34,13 @@ function HeroSection() {
           Превращаю любимых аниме персонажей в произведения искусства на вашей коже
         </p>
         <div className="flex gap-4 justify-center flex-wrap">
-          <Button size="lg" className="bg-primary hover:bg-primary/90 text-white text-lg px-8 py-6 shadow-2xl hover-lift">
+          <Button 
+            size="lg" 
+            className="bg-primary hover:bg-primary/90 text-white text-lg px-8 py-6 shadow-2xl hover-lift"
+            onClick={handleOrderClick}
+          >
             <Icon name="Calendar" size={20} className="mr-2" />
-            Записаться на сеанс
+            Оформить заказ
           </Button>
           <Button size="lg" variant="outline" className="bg-white/10 border-2 border-white text-white hover:bg-white/20 text-lg px-8 py-6 backdrop-blur-sm">
             <Icon name="Image" size={20} className="mr-2" />

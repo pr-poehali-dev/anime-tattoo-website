@@ -1,0 +1,35 @@
+{
+  "tests": [
+    {
+      "name": "Test send message",
+      "method": "POST",
+      "path": "/",
+      "headers": {
+        "X-User-Id": "1"
+      },
+      "body": {
+        "order_id": 1,
+        "message": "Здравствуйте! Когда можем обсудить детали?"
+      },
+      "expectedStatus": 201,
+      "bodyMatcher": "skip"
+    },
+    {
+      "name": "Test get messages",
+      "method": "GET",
+      "path": "/?order_id=1",
+      "headers": {
+        "X-User-Id": "1"
+      },
+      "expectedStatus": 200,
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Test unauthorized access",
+      "method": "GET",
+      "path": "/?order_id=1",
+      "expectedStatus": 401,
+      "bodyMatcher": "partial"
+    }
+  ]
+}

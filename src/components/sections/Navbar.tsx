@@ -61,7 +61,11 @@ function Navbar({
           ) : (
             <Dialog open={isAuthOpen} onOpenChange={onAuthOpenChange}>
               <DialogTrigger asChild>
-                <Button variant="outline" className="bg-white/10 text-white border-white/20 hover:bg-white/20">
+                <Button 
+                  variant="outline" 
+                  className="bg-white/10 text-white border-white/20 hover:bg-white/20"
+                  data-auth-button
+                >
                   <Icon name="User" size={16} className="mr-2" />
                   Войти
                 </Button>

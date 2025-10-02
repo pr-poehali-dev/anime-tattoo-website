@@ -1,0 +1,35 @@
+{
+  "tests": [
+    {
+      "name": "Test create order",
+      "method": "POST",
+      "path": "/",
+      "headers": {
+        "X-User-Id": "1"
+      },
+      "body": {
+        "service_type": "Тату в стиле аниме",
+        "description": "Хочу персонажа из Наруто на плече"
+      },
+      "expectedStatus": 201,
+      "bodyMatcher": "skip"
+    },
+    {
+      "name": "Test get orders list",
+      "method": "GET",
+      "path": "/",
+      "headers": {
+        "X-User-Id": "1"
+      },
+      "expectedStatus": 200,
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Test unauthorized access",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 401,
+      "bodyMatcher": "partial"
+    }
+  ]
+}
