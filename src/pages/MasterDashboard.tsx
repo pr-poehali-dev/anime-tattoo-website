@@ -114,7 +114,6 @@ const MasterDashboard = () => {
 
       setNewMessage('');
       await loadMessages(selectedOrder.id);
-      await loadOrders();
     } catch (error) {
       toast({
         title: 'Ошибка',
@@ -145,8 +144,15 @@ const MasterDashboard = () => {
         description: 'Цена выставлена. Клиент получит уведомление',
       });
 
-      await loadOrders();
-      const updated = orders.find(o => o.id === selectedOrder.id);
+      const response = await fetch('https://functions.poehali.dev/70a8d501-1b95-4105-97ed-d5928e0e12d5', {
+        headers: {
+          'X-User-Id': userId!,
+        },
+      });
+      const updatedOrders = await response.json();
+      setOrders(updatedOrders);
+      
+      const updated = updatedOrders.find((o: Order) => o.id === selectedOrder.id);
       if (updated) setSelectedOrder(updated);
     } catch (error) {
       toast({
