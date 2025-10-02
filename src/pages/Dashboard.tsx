@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,8 +15,11 @@ function Dashboard() {
   const [token, setToken] = useState<string | null>(null);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const hasRedirected = useRef(false);
 
   useEffect(() => {
+    if (hasRedirected.current) return;
+    
     const auth = storage.getAuth();
     if (!auth) {
       navigate('/');
@@ -25,12 +28,13 @@ function Dashboard() {
     setUser(auth.user);
     setToken(auth.token);
     
+    hasRedirected.current = true;
     if (auth.user.role === 'master') {
-      navigate('/master-dashboard');
+      navigate('/master-dashboard', { replace: true });
     } else {
-      navigate('/client-dashboard');
+      navigate('/client-dashboard', { replace: true });
     }
-  }, []);
+  }, [navigate]);
 
   const loadBookings = async (userId: number, authToken: string) => {
     setIsLoading(true);
