@@ -76,18 +76,24 @@ const ClientDashboard = () => {
     } catch (error) {
       console.error('Error loading orders:', error);
       
-      const demoOrders: Order[] = [
-        {
-          id: 1,
-          service_type: 'Тату в стиле аниме',
-          description: 'Хочу татуировку персонажа из Наруто на плече',
-          status: 'discussing',
-          price: null,
-          payment_method: null,
-          created_at: new Date().toISOString(),
-        },
-      ];
-      setOrders(demoOrders);
+      const localOrders = JSON.parse(localStorage.getItem('demo_orders') || '[]');
+      
+      if (localOrders.length === 0) {
+        const demoOrders: Order[] = [
+          {
+            id: 1,
+            service_type: 'Тату в стиле аниме',
+            description: 'Хочу татуировку персонажа из Наруто на плече',
+            status: 'discussing',
+            price: null,
+            payment_method: null,
+            created_at: new Date().toISOString(),
+          },
+        ];
+        setOrders(demoOrders);
+      } else {
+        setOrders(localOrders);
+      }
       setIsLoading(false);
     }
   };
