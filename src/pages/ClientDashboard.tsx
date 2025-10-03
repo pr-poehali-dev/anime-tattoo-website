@@ -48,6 +48,14 @@ const ClientDashboard = () => {
       return;
     }
     console.log('Loading orders for userId:', userId);
+    
+    const localOrders = JSON.parse(localStorage.getItem('demo_orders') || '[]');
+    if (localOrders.length > 0) {
+      console.log('Found local orders:', localOrders);
+      setOrders(localOrders);
+      setIsLoading(false);
+    }
+    
     loadOrders();
   }, [userId, navigate]);
 
@@ -60,6 +68,8 @@ const ClientDashboard = () => {
       }
     }
   }, [searchParams, orders]);
+
+
 
   const loadOrders = async () => {
     try {
