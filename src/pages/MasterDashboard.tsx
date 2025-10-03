@@ -56,7 +56,8 @@ const MasterDashboard = () => {
 
   const loadOrders = async () => {
     const localOrders = JSON.parse(localStorage.getItem('demo_orders') || '[]');
-    console.log('Master loading orders from localStorage:', localOrders);
+    console.log('🔵 MASTER: Loading orders from localStorage:', localOrders);
+    console.log('🔵 MASTER: Found', localOrders.length, 'orders');
     
     if (localOrders.length > 0) {
       const ordersWithDetails = localOrders.map((order: any) => ({
@@ -65,10 +66,13 @@ const MasterDashboard = () => {
         client_name: order.client_name || 'Клиент',
         client_email: order.client_email || 'client@example.com',
       }));
+      console.log('🔵 MASTER: Setting orders:', ordersWithDetails);
       setOrders(ordersWithDetails);
       setIsLoading(false);
       return;
     }
+    
+    console.log('🔵 MASTER: No local orders, trying API...');
     
     try {
       const response = await fetch('https://functions.poehali.dev/70a8d501-1b95-4105-97ed-d5928e0e12d5', {
