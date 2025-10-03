@@ -70,7 +70,8 @@ const ClientDashboard = () => {
       });
       const data = await response.json();
       console.log('Loaded orders:', data);
-      setOrders(data);
+      
+      setOrders(Array.isArray(data) ? data : []);
       setIsLoading(false);
     } catch (error) {
       console.error('Error loading orders:', error);
