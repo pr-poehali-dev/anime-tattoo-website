@@ -48,14 +48,6 @@ const ClientDashboard = () => {
       return;
     }
     console.log('Loading orders for userId:', userId);
-    
-    const localOrders = JSON.parse(localStorage.getItem('demo_orders') || '[]');
-    if (localOrders.length > 0) {
-      console.log('Found local orders:', localOrders);
-      setOrders(localOrders);
-      setIsLoading(false);
-    }
-    
     loadOrders();
   }, [userId, navigate]);
 
@@ -72,6 +64,15 @@ const ClientDashboard = () => {
 
 
   const loadOrders = async () => {
+    const localOrders = JSON.parse(localStorage.getItem('demo_orders') || '[]');
+    console.log('Loading orders from localStorage:', localOrders);
+    
+    if (localOrders.length > 0) {
+      setOrders(localOrders);
+      setIsLoading(false);
+      return;
+    }
+    
     try {
       const response = await fetch('https://functions.poehali.dev/70a8d501-1b95-4105-97ed-d5928e0e12d5', {
         headers: {
@@ -79,31 +80,13 @@ const ClientDashboard = () => {
         },
       });
       const data = await response.json();
-      console.log('Loaded orders:', data);
+      console.log('Loaded orders from API:', data);
       
       setOrders(Array.isArray(data) ? data : []);
       setIsLoading(false);
     } catch (error) {
       console.error('Error loading orders:', error);
-      
-      const localOrders = JSON.parse(localStorage.getItem('demo_orders') || '[]');
-      
-      if (localOrders.length === 0) {
-        const demoOrders: Order[] = [
-          {
-            id: 1,
-            service_type: 'Тату в стиле аниме',
-            description: 'Хочу татуировку персонажа из Наруто на плече',
-            status: 'discussing',
-            price: null,
-            payment_method: null,
-            created_at: new Date().toISOString(),
-          },
-        ];
-        setOrders(demoOrders);
-      } else {
-        setOrders(localOrders);
-      }
+      setOrders([]);
       setIsLoading(false);
     }
   };

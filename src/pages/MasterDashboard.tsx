@@ -55,6 +55,21 @@ const MasterDashboard = () => {
   }, [userId, navigate]);
 
   const loadOrders = async () => {
+    const localOrders = JSON.parse(localStorage.getItem('demo_orders') || '[]');
+    console.log('Master loading orders from localStorage:', localOrders);
+    
+    if (localOrders.length > 0) {
+      const ordersWithDetails = localOrders.map((order: any) => ({
+        ...order,
+        user_id: order.user_id || 999,
+        client_name: order.client_name || 'Клиент',
+        client_email: order.client_email || 'client@example.com',
+      }));
+      setOrders(ordersWithDetails);
+      setIsLoading(false);
+      return;
+    }
+    
     try {
       const response = await fetch('https://functions.poehali.dev/70a8d501-1b95-4105-97ed-d5928e0e12d5', {
         headers: {
@@ -62,40 +77,13 @@ const MasterDashboard = () => {
         },
       });
       const data = await response.json();
-      console.log('Master loaded orders:', data);
+      console.log('Master loaded orders from API:', data);
       
       setOrders(Array.isArray(data) ? data : []);
       setIsLoading(false);
     } catch (error) {
       console.error('Error loading orders:', error);
-      
-      const demoOrders: Order[] = [
-        {
-          id: 1,
-          user_id: 999,
-          client_name: 'Анна К.',
-          client_email: 'anna@example.com',
-          service_type: 'Тату в стиле аниме',
-          description: 'Хочу татуировку персонажа из Наруто на плече',
-          status: 'pending',
-          price: null,
-          payment_method: null,
-          created_at: new Date().toISOString(),
-        },
-        {
-          id: 2,
-          user_id: 998,
-          client_name: 'Дмитрий С.',
-          client_email: 'dmitry@example.com',
-          service_type: 'Эскиз татуировки',
-          description: 'Нужен эскиз дракона в японском стиле',
-          status: 'discussing',
-          price: null,
-          payment_method: null,
-          created_at: new Date(Date.now() - 86400000).toISOString(),
-        },
-      ];
-      setOrders(demoOrders);
+      setOrders([]);
       setIsLoading(false);
     }
   };
