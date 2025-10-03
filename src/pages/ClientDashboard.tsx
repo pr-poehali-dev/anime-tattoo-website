@@ -121,7 +121,7 @@ const ClientDashboard = () => {
         },
       });
       const data = await response.json();
-      setMessages(data);
+      setMessages(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error loading messages:', error);
       
@@ -131,7 +131,7 @@ const ClientDashboard = () => {
           sender_id: 1,
           sender_name: 'Мастер',
           sender_role: 'master',
-          message: 'Здравствуйте! Отличная идея с Наруто! Я специализируюсь на аниме-тату. Какого размера планируете?',
+          message: 'Здравствуйте! Отличная идея! Я специализируюсь на аниме-тату. Какого размера планируете?',
           created_at: new Date(Date.now() - 3600000).toISOString(),
         },
       ];
