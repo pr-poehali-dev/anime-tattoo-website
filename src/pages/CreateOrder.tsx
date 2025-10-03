@@ -76,6 +76,20 @@ const CreateOrder = () => {
       existingOrders.push(newOrder);
       localStorage.setItem('demo_orders', JSON.stringify(existingOrders));
 
+      const initialMessage = {
+        id: Date.now(),
+        order_id: newOrder.id,
+        sender_id: parseInt(userId),
+        sender_name: 'Вы',
+        sender_role: 'client',
+        message: `${serviceType}\n\n${description}`,
+        created_at: new Date().toISOString(),
+      };
+      
+      const existingMessages = JSON.parse(localStorage.getItem('demo_messages') || '[]');
+      existingMessages.push(initialMessage);
+      localStorage.setItem('demo_messages', JSON.stringify(existingMessages));
+
       toast({
         title: 'Заказ создан!',
         description: 'Мастер скоро с вами свяжется',

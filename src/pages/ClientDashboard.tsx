@@ -97,6 +97,14 @@ const ClientDashboard = () => {
   };
 
   const loadMessages = async (orderId: number) => {
+    const allMessages = JSON.parse(localStorage.getItem('demo_messages') || '[]');
+    const orderMessages = allMessages.filter((msg: any) => msg.order_id === orderId);
+    
+    if (orderMessages.length > 0) {
+      setMessages(orderMessages);
+      return;
+    }
+    
     try {
       const response = await fetch(`https://functions.poehali.dev/702e7931-41cc-45a8-ad61-5ca8fc761bab?order_id=${orderId}`, {
         headers: {
@@ -107,23 +115,29 @@ const ClientDashboard = () => {
       setMessages(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error loading messages:', error);
-      
-      const demoMessages: Message[] = [
-        {
-          id: 1,
-          sender_id: 1,
-          sender_name: 'Мастер',
-          sender_role: 'master',
-          message: 'Здравствуйте! Отличная идея! Я специализируюсь на аниме-тату. Какого размера планируете?',
-          created_at: new Date(Date.now() - 3600000).toISOString(),
-        },
-      ];
-      setMessages(demoMessages);
+      setMessages([]);
     }
   };
 
   const sendMessage = async () => {
     if (!newMessage.trim() || !selectedOrder) return;
+
+    const message = {
+      id: Date.now(),
+      order_id: selectedOrder.id,
+      sender_id: parseInt(userId!),
+      sender_name: 'Вы',
+      sender_role: 'client',
+      message: newMessage,
+      created_at: new Date().toISOString(),
+    };
+
+    const existingMessages = JSON.parse(localStorage.getItem('demo_messages') || '[]');
+    existingMessages.push(message);
+    localStorage.setItem('demo_messages', JSON.stringify(existingMessages));
+
+    setNewMessage('');
+    await loadMessages(selectedOrder.id);
 
     try {
       await fetch('https://functions.poehali.dev/702e7931-41cc-45a8-ad61-5ca8fc761bab', {
@@ -137,16 +151,8 @@ const ClientDashboard = () => {
           message: newMessage,
         }),
       });
-
-      setNewMessage('');
-      await loadMessages(selectedOrder.id);
-      await loadOrders();
     } catch (error) {
-      toast({
-        title: 'Ошибка',
-        description: 'Не удалось отправить сообщение',
-        variant: 'destructive',
-      });
+      console.error('Error sending message to API:', error);
     }
   };
 
